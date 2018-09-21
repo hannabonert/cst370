@@ -1,0 +1,258 @@
+#include <iostream>
+#include <time.h>
+#include <stdlib.h>
+
+using namespace std;
+
+void selectionSort(int A[ ], int lengthA);
+void insertionSort(int A[ ], int lengthA);
+void quickSort(int A[ ], int l, int r);
+void generateInputData(int A[], int inputSize, int orderNumber);
+int HoarePartition(int A[ ], int l, int r);
+
+int main()
+{
+   int inputSize, orderChoice;
+   time_t startTime, endTime;
+   double elapsedTime;
+   string startStr, endStr;
+
+   cout << "Please enter an input size: ";
+   cin >> inputSize;
+
+   cout << "Select order of input numbers: " << endl;
+   cout << "1. Ascending Order" << endl << "2. Descending Order" << endl
+   << "3. Random Order" << endl;
+   cout << "Choose Order: ";
+   cin >> orderChoice;
+
+   int * A;
+   A = new int [inputSize];
+
+   generateInputData(A, inputSize, orderChoice);
+
+   int * B;
+   B = new int [inputSize];
+
+   int * C;
+   C = new int [inputSize];
+
+   for(int i = 0; i < inputSize; i++)
+      B[i] = C[i] = A[i];
+
+
+   for(int i = 0; i < inputSize; i++)
+      cout << C[i] << " " << endl;
+/*
+   startTime = time(NULL);
+   selectionSort(A, inputSize);
+   endTime = time(NULL);
+   elapsedTime = endTime - startTime;
+   cout << "Selection sort performance---------------" << endl;
+   cout << "Starting time: " << ctime(&startTime);
+   cout << "Ending time: " << ctime(&endTime);
+   cout << "Elapsed time: " << elapsedTime << " seconds" << endl << endl;
+
+   startTime = time(NULL);
+   insertionSort(B, 8);
+   endTime = time(NULL);
+   elapsedTime = endTime - startTime;
+   cout << "Insertion sort performance---------------" << endl;
+   cout << "Starting time: " << ctime(&startTime);
+   cout << "Ending time: " << ctime(&endTime);
+   cout << "Elapsed time: " << elapsedTime << " seconds" << endl << endl;*/
+
+   startTime = time(NULL);
+   quickSort(C, 0, inputSize - 1);
+   endTime = time(NULL);
+   elapsedTime = endTime - startTime;
+   cout << "Quick sort performance---------------" << endl;
+   cout << "Starting time: " << ctime(&startTime);
+   cout << "Ending time: " << ctime(&endTime);
+   cout << "Elapsed time: " << elapsedTime << " seconds" << endl << endl;
+
+   for(int i = 0; i < inputSize; i++)
+      cout << C[i] << endl;
+
+   delete [] A;
+   delete [] B;
+   delete [] C;
+
+}
+
+void generateInputData(int A[], int inputSize, int orderNumber)
+{
+   switch(orderNumber)
+   {
+         //ascending order
+      case 1: for(int i = 0; i < inputSize; i++)
+         A[i] = i + 1;
+         break;
+         //descending order
+      case 2: for(int i = inputSize, j = 0; i > 0; i--, j++)
+         A[j] = i;
+         break;
+         //random
+      case 3: srand (time(NULL));
+         for(int i = 0; i < inputSize; i++)
+         {
+
+            A[i] = rand() % (2 * inputSize);
+         }
+         break;
+   }
+}
+
+/*This sorting algorithm scans the array, finds the smallest element, and
+ * exchanges it with the first element. Then it scans the list from the second
+ * element onwards, and places the minimal element in the second position. The
+ * algorithm continues until the list is finished. Efficiency: Theta (n^2)
+ * CAUTION: This function sorts the array in place
+ */
+void selectionSort(int A[ ], int lengthA)
+{
+   int min, temp;
+
+   for(int i = 0; i < lengthA - 1; i++)
+   {
+      min = i;
+
+      for(int j = i + 1; j < lengthA; j++)
+      {
+         if(A[j] < A[min])
+            min = j;
+      }
+
+      temp = A[i];
+      A[i] = A[min];
+      A[min] = temp;
+   }
+}
+/* My implementation
+ void insertionSort(int A[ ], int lengthA)
+ {
+ int value, hole, compVal;
+ for(int i = 1; i < lengthA; i++)
+ {
+ hole = i;
+ value = A[hole];
+
+ for(int j = i - 1; j >= 0; j--)
+ {
+ compVal = A[j];
+ if(compVal > value)
+ {
+ A[hole] = compVal;
+ hole--;
+ }
+ else
+ break;
+ }
+
+ A[hole] = value;
+ }
+ }
+ */
+
+void insertionSort(int A[], int lengthA)
+{
+   int value, compPos;
+   for(int i = 1; i < lengthA; i++)
+   {
+      value = A[i];
+      compPos = i - 1;
+
+      while(compPos >= 0 && A[compPos] > value)
+      {
+         A[compPos + 1] = A[compPos];
+         compPos--;
+      }
+      A[compPos + 1] = value;
+   }
+}
+/*
+//partitions a subarray using Hoare's algorithm. Pivot = first element
+//my implementation
+void quickSort(int A[ ], int lengthA)
+{
+   //recursive base case
+   if(lengthA < 2)
+      return;
+
+   int pivot = A[0], leftVar = 1, rightVar = lengthA - 1, temp;
+
+   while(rightVar > leftVar)
+   {
+      int a = A[leftVar], b = A[rightVar];
+      while(A[leftVar] < pivot)
+         leftVar++;
+      while(A[rightVar] > pivot)
+         rightVar--;
+
+      //swap the elements at positions leftVar and rightVar
+      temp = A[rightVar];
+      A[rightVar] = A[leftVar];
+      A[leftVar] = temp;
+   }
+
+   //undo last swap when leftVar >= rightVar
+   temp = A[rightVar];
+   A[rightVar] = A[leftVar];
+   A[leftVar] = temp;
+
+   temp = A[rightVar];
+   A[rightVar] = pivot;
+   A[0] = temp;
+
+   quickSort(A, rightVar - 1);
+   quickSort(&A[rightVar + 1], lengthA - rightVar - 1);
+}
+*/
+void quickSort(int A[ ], int l, int r)
+{
+   int s;
+   if(l < r)
+   {
+      s = HoarePartition(A, l, r);
+      quickSort(A, l, s - 1);
+      quickSort(A, s + 1, r);
+   }
+}
+
+int HoarePartition(int A[ ], int l, int r)
+{
+   int p = A[l], i = l, j = r + 1, temp;
+
+   do
+   {
+      do
+      {
+         i++;
+      } while(A[i] < p);
+
+      do
+      {
+         j--;
+      } while(A[j] > p);
+
+
+      temp = A[i];
+      A[i] = A[j];
+      A[j] = temp;
+
+   } while(i < j);
+
+
+   temp = A[i];
+   A[i] = A[j];
+   A[j] = temp;
+
+   temp = A[l];
+   A[l] = A[j];
+   A[j] = temp;
+
+
+   return j;
+}
+
+
